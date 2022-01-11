@@ -10,8 +10,8 @@ class MQTTClient:
     self.topic = "SensorTile"
     self.client_id = f'python-mqtt-{random.randint(0, 1000)}'
     self.client = None
+    self.chairs = []
     self.run()
-
 
   # generate client ID with pub prefix randomly
   def connect_mqtt(self):
@@ -26,17 +26,25 @@ class MQTTClient:
     client.connect(self.broker, self.port)
     return client
 
-
-  def publish(self, msg):
-    self.client.publish(self.topic, msg)
-
   def subscribe(self, client):
     def on_message(client, userdata, msg):
-      print(f"Received `{msg.payload.decode()}` from `{msg.topic}` topic")
+      self.processMessage(msg)
         
     client.subscribe(self.topic)
     client.on_message = on_message
+  
+  def isUniqueChair(self, chairId):
+    if chairId in self.chairs:
+      return False
+    return True
 
+  def processMessage(self, msg):
+    message = msg.payload.decode()
+    chair = message.split()[0][:-1]
+    if self.isUniqueChair(chair):
+      self.chairs.append(chair)
+    print(message)
+  
   def run(self):
     client = self.connect_mqtt()
     self.subscribe(client)

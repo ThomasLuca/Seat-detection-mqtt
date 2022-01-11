@@ -1,5 +1,5 @@
 import serial
-from mqtt_test import MQTTClient
+from mqtt_client import MQTTClient
 
 client = MQTTClient()
 
